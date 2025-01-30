@@ -8,6 +8,7 @@ from schemas.base import Candle
 from schemas.params import ChartParams
 from trading.indicators import RSI, BaseIndicator, Signal, TripleEma
 
+
 INDICATORS = {
     "TripleEma": TripleEma,
     "RSI": RSI,

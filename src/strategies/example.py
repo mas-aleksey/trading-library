@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
 
-from common.enums import Signal
-from common.schemas import Candle, OrderIN, Position
+from schemas.base import Candle, Position, OrderIN
 from strategies.base import BaseStrategy
+from trading.indicators import Signal
 
 
 @dataclass
@@ -30,12 +30,12 @@ class ExampleStrategy(BaseStrategy):
         self.orders = [(d, balance * r) for d, r in self.orders_map]
         _, cost = self.orders.pop(0)
         amount = cost / candle.close
-        order = await self.exchange.place_order(OrderIN.buy(self.symbol, amount, candle))
+        order = await self.exchange.place_order(OrderIN.buy(self.symbol, amount, candle, candle.time))
         self.position = Position.new(order)
 
     async def close_position(self, candle: Candle) -> Position:
         amount, balance = await self.exchange.get_balance(self.symbol)
-        order = await self.exchange.place_order(OrderIN.sell(self.symbol, amount, candle))
+        order = await self.exchange.place_order(OrderIN.sell(self.symbol, amount, candle, candle.time))
         self.position.add_sell(order)
         position = self.position
         self.position = None
@@ -55,5 +55,5 @@ class ExampleStrategy(BaseStrategy):
         if cost == 0:
             return
         amount = cost / candle.close
-        order = await self.exchange.place_order(OrderIN.buy(self.symbol, amount, candle))
+        order = await self.exchange.place_order(OrderIN.buy(self.symbol, amount, candle, candle.time))
         self.position.add_buy(order)

@@ -1,10 +1,10 @@
 from typing import Generator
 
-from exchanges.bingx.client import BingXClient, BingXConfig
 from pydantic import BaseModel
 
 from schemas.base import Candle, OrderIN, Order
 from trading.exchanges.base import BaseExchange
+
 
 BINGX_INTERVALS = {
     1: "1m",

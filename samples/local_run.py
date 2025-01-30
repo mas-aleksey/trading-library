@@ -6,7 +6,7 @@ from common.chart import Chart
 from common.params import WorkerParams
 from common.woker import Strategy
 from exchanges.local.config import CSVConfig
-from exchanges.local.exchange import CSVExchange
+from exchanges.local.local import CSVExchange
 from strategies.example import ExampleStrategy
 
 STRATEGY = Strategy(

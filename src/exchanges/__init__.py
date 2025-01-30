@@ -1,4 +1,5 @@
-from .bingx.exchange import BingXExchange
-from .local.exchange import CSVExchange
+from .bingx import BingXExchange
+from .local import CSVExchange
+
 
 __all__ = ["BingXExchange", "CSVExchange"]

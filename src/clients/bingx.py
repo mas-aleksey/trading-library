@@ -2,20 +2,19 @@ import hmac
 import time
 from hashlib import sha256
 
-from clients.base import BaseClient
-from core.settings import BingXConfig
-from schemas.bingx import (
+from async_client import BaseClient
+from exchanges.bingx.config import BingXConfig
+from exchanges.bingx.schemas import (
     BingXBalances,
     BingXBalancesResponse,
     BingXCandleResponse,
-    BingXOrderHist,
     BingXOrderOut,
     BingXOrderResponse,
-    BingXOrdersResponse,
 )
 
 
 class BingXClient(BaseClient[BingXConfig]):
+
     @property
     def headers(self) -> dict:
         return {
@@ -33,7 +32,7 @@ class BingXClient(BaseClient[BingXConfig]):
         else:
             return params_str + "timestamp=" + str(int(time.time() * 1000))
 
-    def _make_signed_url(self, path: str, **kwargs) -> str:
+    def _make_signed_url(self, path: str, **kwargs) -> str:  # noqa: ANN003
         url_params = self._parse_param(kwargs)
         sign = hmac.new(
             self.config.SECRET_KEY.encode("utf-8"),
@@ -56,54 +55,23 @@ class BingXClient(BaseClient[BingXConfig]):
         response = self.load_schema(base_resp.body, BingXCandleResponse)
         return response.data
 
-    async def get_funds(self) -> None:
-        url = self._make_signed_url("/openApi/api/v3/capital/deposit/hisrec")
-        base_resp = await self._perform_request("GET", url, headers=self.headers)
-        for i in base_resp.body:
-            print(i)  # noqa T201
-
     async def get_balances(self) -> BingXBalances:
         url = self._make_signed_url("/openApi/spot/v1/account/balance")
         base_resp = await self._perform_request("GET", url, headers=self.headers)
         response = self.load_schema(base_resp.body, BingXBalancesResponse)
         return response.data
 
-    async def place_order(
-        self, symbol: str, side: str, amount: float, client_oid: str
+    async def place_order(  # noqa: PLR0913
+        self, symbol: str, side: str, quantity: float, client_oid: str, order_type: str = "MARKET"
     ) -> BingXOrderOut:
         url = self._make_signed_url(
             "/openApi/spot/v1/trade/order",
             symbol=symbol,
-            type="MARKET",
+            type=order_type,
             side=side,
-            quantity=amount,
+            quantity=quantity,
             newClientOrderId=client_oid,
         )
         base_resp = await self._perform_request("POST", url, headers=self.headers)
         response = self.load_schema(base_resp.body, BingXOrderResponse)
-        return response.data
-
-    async def get_order_history(self, symbol: str, start_time: int = None) -> list[BingXOrderHist]:
-        url = self._make_signed_url(
-            "/openApi/spot/v1/trade/historyOrders",
-            symbol=symbol,
-            startTime=start_time,
-            endTime=int(time.time() * 1000),
-        )
-        base_resp = await self._perform_request("GET", url, headers=self.headers)
-        response = self.load_schema(base_resp.body, BingXOrdersResponse)
-        return response.data.orders
-
-
-# async def main() -> None:
-#     from core.settings import get_settings
-#
-#     settings = get_settings()
-#     async with BingXClient(settings.BINGX) as client:
-#         await client.get_funds()
-#
-#
-# if __name__ == "__main__":
-#     import asyncio
-#
-#     asyncio.run(main())
+        return response.data.order

@@ -4,10 +4,10 @@ from datetime import timedelta
 from pathlib import Path
 from uuid import UUID
 
-from common.chart import Chart
-from common.enums import OrderSide, Signal
-from common.exchange import BaseExchange
-from common.schemas import Candle, Position
+from schemas.base import Position, Candle, OrderSide
+from trading.chart import Chart
+from trading.exchanges.base import BaseExchange
+from trading.indicators import Signal
 
 
 @dataclass
