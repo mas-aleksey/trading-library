@@ -2,6 +2,7 @@ import asyncio
 
 from common.woker import Strategy, WorkerManager
 
+
 STRATEGY = Strategy(
     name="KnifeStrategy",
     params={

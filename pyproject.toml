@@ -11,6 +11,9 @@ python = "^3.11"
 async-client-lib = "^0.1.5"
 pandas = "^2.2.3"
 plotly = "^5.24.1"
+alembic = "^1.14.1"
+sqlalchemy = "^2.0.37"
+kaleido = "0.1.0post1"
 
 [tool.poetry.group.dev.dependencies]
 aioresponses = "^0.7.6"
@@ -32,9 +35,12 @@ line-length = 100
 target-version = "py311"
 lint.select = ["E", "W", "T", "C90", "I", "N", "ANN", "S", "B", "A", "PL", "PTH", "F", "ARG"]
 lint.ignore = [
-    "ANN101", "ANN102",
+    "ANN101",  # Missing type annotation for `self` in method
+    "ANN102",  # Missing type annotation for `cls` in classmethod
+    "ANN003",  # Missing type annotation for `**kwargs`
+
     # TODO: fix codes below
-    "N815",
+    "N815",  # Variable `.....` in class scope should not be mixedCase
 ]
 
 [tool.ruff.lint.per-file-ignores]

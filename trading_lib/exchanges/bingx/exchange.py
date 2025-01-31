@@ -2,7 +2,8 @@ from typing import Generator
 
 from common.exchange import BaseExchange
 from common.schemas import Candle, Order, OrderIN
-from exchanges.bingx.client import BingXClient, BingXConfig
+from exchanges.bingx.client import BingXClient
+from exchanges.bingx.config import BingXConfig
 from pydantic import BaseModel
 
 BINGX_INTERVALS = {
@@ -30,7 +31,6 @@ class BingXPairStat(BaseModel):
 
 
 class BingXExchange(BaseExchange):
-
     def __init__(self, config: BingXConfig) -> None:
         self.client = BingXClient(config)
         self.statistics: dict[str, BingXPairStat] = {}

@@ -7,7 +7,9 @@ from uuid import UUID
 from common.chart import Chart
 from common.enums import OrderSide, Signal
 from common.exchange import BaseExchange
+from common.notifier import NotifyService
 from common.schemas import Candle, Position
+from db.db_connector import DatabaseConnector
 
 
 @dataclass
@@ -19,6 +21,8 @@ class BaseStrategy:
     online_check: bool
     position: Position | None = field(init=False)
     logger: logging.Logger = field(init=False)
+    db: DatabaseConnector | None = field(init=False)
+    notifier: NotifyService | None = field(init=False)
 
     def __post_init__(self) -> None:
         self.position = None
@@ -53,7 +57,8 @@ class BaseStrategy:
         fig.add_hline(y=position.avg_price, line_color="blue", **params)
         fig.add_vline(x=position.orders[0].time, line_color="green", **params)
 
-        file_name = f"{position.orders[0].time.isoformat()}-deal.jpg"
+        pattern = '%Y.%m.%d-%H.%M.%S'
+        file_name = f"{position.orders[0].time.strftime(pattern)}-deal.jpg"
         with Path(file_name).open("wb") as f:
             f.write(fig.to_image("jpeg", width=1050, height=750, scale=2))
 

@@ -47,7 +47,6 @@ class Worker:
 
 
 class WorkerManager:
-
     def __init__(self) -> None:
         self._workers: list[Worker] = []
         self._tasks = []

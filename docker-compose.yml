@@ -1,0 +1,56 @@
+version: '3.4'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    restart: always
+    env_file: .env
+    ports:
+      - "15432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-h", "localhost", "-U", "$POSTGRES_USER", "-d", "$POSTGRES_DB" ]
+      retries: 20
+      interval: 3s
+      start_period: 5s
+    networks:
+      - app-network
+
+  app:
+    build: .
+    image: app
+    container_name: app
+    restart: on-failure
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    env_file: .env
+    healthcheck:
+      test: curl --fail http://localhost:8000/healthz || exit 1
+      interval: 2s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      - app-network
+
+  autoheal:
+    restart: always
+    image: willfarrell/autoheal
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=all
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - app-network
+
+volumes:
+  postgres-data:
+
+networks:
+  app-network:
+    external: true
+    name: trade-platform-network
