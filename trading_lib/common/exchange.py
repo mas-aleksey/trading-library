@@ -5,7 +5,6 @@ from common.schemas import Candle, Order, OrderIN
 
 
 class BaseExchange(abc.ABC):
-
     @abc.abstractmethod
     async def stop(self) -> None:
         raise NotImplementedError("Please implement 'stop' method")
